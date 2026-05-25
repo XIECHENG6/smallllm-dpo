@@ -1,0 +1,51 @@
+deepseek:
+  base_url: "https://api.deepseek.com/v1"
+  model: "deepseek-chat"
+  max_retries: 3
+
+sft_model:
+  base: "Qwen/Qwen2.5-3B-Instruct"
+  adapter: null  # Set to HF path of Phase 1 LoRA adapter, e.g. "Cheng-1/qwen2.5-3b-fc-lora"
+
+dpo:
+  beta: 0.5
+  learning_rate: 5e-6
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  num_train_epochs: 1
+  max_length: 512
+  max_prompt_length: 384
+  warmup_ratio: 0.1
+  lr_scheduler_type: "cosine"
+  logging_steps: 10
+  save_steps: 200
+  output_dir: "./dpo_output"
+
+qlora:
+  bits: 4
+  quant_type: "nf4"
+  double_quant: true
+  compute_dtype: "bfloat16"
+  lora_rank: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+data:
+  num_scenarios: 1000
+  num_samples_per_scenario: 4
+  sampling_temperature: 0.8
+  seed: 42
+  train_ratio: 0.9
+
+evaluation:
+  num_test_samples: 200
+  judge_model: "deepseek-chat"
+  num_safety_tests: 50
